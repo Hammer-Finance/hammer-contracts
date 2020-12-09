@@ -24,9 +24,6 @@ contract Controller {
     mapping(address => address) public strategies;
     mapping(address => mapping(address => bool)) public approvedStrategies;
 
-    uint256 public split = 500;
-    uint256 public constant max = 10000;
-
     constructor(address _rewards) public {
         governance = msg.sender;
         strategist = msg.sender;
