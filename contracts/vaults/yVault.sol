@@ -19,6 +19,8 @@ contract yVault is ERC20, ERC20Detailed {
 
     uint256 public min = 9500;
     uint256 public constant max = 10000;
+    uint256 public fairRate = 150;
+    uint256 public constant fairRateMax = 10000;
 
     address public governance;
     address public controller;
@@ -26,8 +28,8 @@ contract yVault is ERC20, ERC20Detailed {
     constructor(address _token, address _controller)
         public
         ERC20Detailed(
-            string(abi.encodePacked("yearn ", ERC20Detailed(_token).name())),
-            string(abi.encodePacked("y", ERC20Detailed(_token).symbol())),
+            string(abi.encodePacked("hammer ", ERC20Detailed(_token).name())),
+            string(abi.encodePacked("h", ERC20Detailed(_token).symbol())),
             ERC20Detailed(_token).decimals()
         )
     {
@@ -114,10 +116,19 @@ contract yVault is ERC20, ERC20Detailed {
             }
         }
 
-        token.safeTransfer(msg.sender, r);
+        // Charge the withdrawl fee
+        // The withdrawl fee will not take by controller but go back to all users
+        uint256 _fee = r.mul(fairRate).div(fairRateMax);
+
+        token.safeTransfer(msg.sender, r.sub(_fee));
     }
 
     function getPricePerFullShare() public view returns (uint256) {
         return balance().mul(1e18).div(totalSupply());
+    }
+
+    function setFairRate(uint256 _fee) external {
+        require(msg.sender == governance, "!governance");
+        fairRate = _fee;
     }
 }

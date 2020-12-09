@@ -1,0 +1,136 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.5.17;
+pragma experimental ABIEncoderV2;
+import "@openzeppelinV2/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelinV2/contracts/math/SafeMath.sol";
+import "@openzeppelinV2/contracts/utils/Address.sol";
+import "@openzeppelinV2/contracts/token/ERC20/SafeERC20.sol";
+
+import "../../interfaces/yearn/IToken.sol";
+
+interface BalDistributer {
+    struct Claim {
+        uint256 week;
+        uint256 balance;
+        bytes32[] merkleProof;
+    }
+
+    function claimWeeks(address, Claim[] calldata) external;
+}
+
+interface BPool {
+    function joinswapExternAmountIn(
+        address tokenIn,
+        uint256 tokenAmountIn,
+        uint256 minPoolAmountOut
+    ) external returns (uint256 poolAmountOut);
+}
+
+interface Controller {
+    function vaults(address) external view returns (address);
+
+    function rewards() external view returns (address);
+}
+
+contract StrategyBalancerBPT {
+    using SafeERC20 for IERC20;
+    using Address for address;
+    using SafeMath for uint256;
+
+    // want = BPT
+    // TODO: Change the address to mainnet address
+    address public constant want = address(0xc5935eA0Ad3645D37B7C545a3E603b24Ee149e0c);
+    address public constant distributer = address(0xD878865A4d9F6327cE7CE48E025ecFEA71D68A08);
+    address public constant bal = address(0x1528F3FCc26d13F7079325Fb78D9442607781c8C);
+    uint256 public performanceFee = 500;
+    uint256 public constant performanceMax = 10000;
+
+    address public governance;
+    address public strategist;
+    address public controller;
+    IERC20 public token;
+    BalDistributer public balDistributer;
+    BPool public bPool;
+
+    constructor(address _controller) public {
+        governance = msg.sender;
+        strategist = msg.sender;
+        balDistributer = BalDistributer(distributer);
+        bPool = BPool(want);
+        controller = _controller;
+    }
+
+    function getName() external pure returns (string memory) {
+        return "StrategyBalancerBPT";
+    }
+
+    function setStrategist(address _strategist) external {
+        require(msg.sender == governance, "!governance");
+        strategist = _strategist;
+    }
+
+    function setPerformanceFee(uint256 _performanceFee) external {
+        require(msg.sender == governance, "!governance");
+        performanceFee = _performanceFee;
+    }
+
+    function deposit() public {
+        // This strategy doesn't need to deposit
+    }
+
+    // Controller only function for creating additional rewards from dust
+    function withdraw(IERC20 _asset) external returns (uint256 balance) {
+        require(msg.sender == governance || msg.sender == strategist, "!controller");
+        require(want != address(_asset), "want");
+        balance = _asset.balanceOf(address(this));
+        _asset.safeTransfer(Controller(controller).rewards(), balance);
+    }
+
+    // Withdraw partial funds, normally used with a vault withdrawal
+    function withdraw(uint256 _amount) external {
+        // since our token did not in gauge, we shall not need to check balance
+        require(msg.sender == controller, "!controller");
+        address _vault = Controller(controller).vaults(address(want));
+        require(_vault != address(0), "!vault"); // additional protection so we don't burn the funds
+        IERC20(want).safeTransfer(_vault, _amount);
+    }
+
+    // Withdraw all funds, normally used when migrating strategies
+    function withdrawAll() external returns (uint256 balance) {
+        require(msg.sender == controller, "!controller");
+        balance = IERC20(want).balanceOf(address(this));
+        address _vault = Controller(controller).vaults(address(want));
+        IERC20(want).safeTransfer(_vault, balance);
+    }
+
+    function balanceOf() public view returns (uint256) {
+        return IERC20(want).balanceOf(address(this));
+    }
+
+    function setGovernance(address _governance) external {
+        require(msg.sender == governance, "!governance");
+        governance = _governance;
+    }
+
+    function harvest(BalDistributer.Claim[] calldata claims) external {
+        require(msg.sender == strategist || msg.sender == governance, "!authorized");
+        balDistributer.claimWeeks(address(this), claims);
+
+        uint256 claimAmount = IERC20(bal).balanceOf(address(this));
+        if (claimAmount > 0) {
+            uint256 _fee = claimAmount.mul(performanceFee).div(performanceMax);
+            IERC20(bal).safeTransfer(Controller(controller).rewards(), _fee);
+
+            uint256 remainAmount = claimAmount.sub(_fee);
+            IERC20(bal).safeApprove(address(bPool), 0);
+            IERC20(bal).safeApprove(address(bPool), remainAmount);
+            bPool.joinswapExternAmountIn(bal, remainAmount, 0);
+        }
+    }
+
+    function setController(address _controller) external {
+        require(msg.sender == governance, "!governance");
+        controller = _controller;
+    }
+}
