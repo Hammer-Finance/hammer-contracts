@@ -7,11 +7,6 @@ import "@openzeppelinV2/contracts/math/SafeMath.sol";
 import "@openzeppelinV2/contracts/utils/Address.sol";
 import "@openzeppelinV2/contracts/token/ERC20/SafeERC20.sol";
 
-import "../../interfaces/curve/Curve.sol";
-import "../../interfaces/curve/Gauge.sol";
-import "../../interfaces/curve/Mintr.sol";
-import "../../interfaces/curve/VoteEscrow.sol";
-import "../../interfaces/uniswap/Uni.sol";
 import "../../interfaces/yearn/IToken.sol";
 
 interface BalDistributer {
@@ -42,16 +37,14 @@ contract StrategyBalancerBPT {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint256;
+
     // want = BPT
+    // TODO: Change the address to mainnet address
     address public constant want = address(0xc5935eA0Ad3645D37B7C545a3E603b24Ee149e0c);
     address public constant distributer = address(0xD878865A4d9F6327cE7CE48E025ecFEA71D68A08);
     address public constant bal = address(0x1528F3FCc26d13F7079325Fb78D9442607781c8C);
     uint256 public performanceFee = 500;
     uint256 public constant performanceMax = 10000;
-    // address public constant pool = address(0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1);
-    // address public constant mintr = address(0xd061D61a4d941c39E5453435B6345Dc261C2fcE0);
-    // address public constant crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
-    // address public constant escrow = address(0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2);
 
     address public governance;
     address public strategist;
@@ -82,14 +75,8 @@ contract StrategyBalancerBPT {
         performanceFee = _performanceFee;
     }
 
-    // TODO: 為什麼要註解掉？
     function deposit() public {
-        // uint256 _want = IERC20(want).balanceOf(address(this));
-        // if (_want > 0) {
-        //     IERC20(want).safeApprove(pool, 0);
-        //     IERC20(want).safeApprove(pool, _want);
-        //     Gauge(pool).deposit(_want);
-        // }
+        // This strategy doesn't need to deposit
     }
 
     // Controller only function for creating additional rewards from dust
@@ -117,42 +104,6 @@ contract StrategyBalancerBPT {
         IERC20(want).safeTransfer(_vault, balance);
     }
 
-    // function _withdrawAll() internal {
-    //     Gauge(pool).withdraw(Gauge(pool).balanceOf(address(this)));
-    // }
-
-    // function createLock(uint256 _value, uint256 _unlockTime) external {
-    //     require(msg.sender == strategy || msg.sender == governance, "!authorized");
-    //     IERC20(crv).safeApprove(escrow, 0);
-    //     IERC20(crv).safeApprove(escrow, _value);
-    //     VoteEscrow(escrow).create_lock(_value, _unlockTime);
-    // }
-
-    // function increaseAmount(uint256 _value) external {
-    //     require(msg.sender == strategy || msg.sender == governance, "!authorized");
-    //     IERC20(crv).safeApprove(escrow, 0);
-    //     IERC20(crv).safeApprove(escrow, _value);
-    //     VoteEscrow(escrow).increase_amount(_value);
-    // }
-
-    // function release() external {
-    //     require(msg.sender == strategy || msg.sender == governance, "!authorized");
-    //     VoteEscrow(escrow).withdraw();
-    // }
-
-    // function _withdrawSome(uint256 _amount) internal returns (uint256) {
-    //     Gauge(pool).withdraw(_amount);
-    //     return _amount;
-    // }
-
-    // function balanceOfWant() public view returns (uint256) {
-    //     return IERC20(want).balanceOf(address(this));
-    // }
-
-    // function balanceOfPool() public view returns (uint256) {
-    //     return Gauge(pool).balanceOf(address(this));
-    // }
-
     function balanceOf() public view returns (uint256) {
         return IERC20(want).balanceOf(address(this));
     }
@@ -161,17 +112,6 @@ contract StrategyBalancerBPT {
         require(msg.sender == governance, "!governance");
         governance = _governance;
     }
-
-    // function execute(
-    //     address to,
-    //     uint256 value,
-    //     bytes calldata data
-    // ) external returns (bool, bytes memory) {
-    //     require(msg.sender == strategy || msg.sender == governance, "!governance");
-    //     (bool success, bytes memory result) = to.call.value(value)(data);
-
-    //     return (success, result);
-    // }
 
     function harvest(BalDistributer.Claim[] calldata claims) external {
         require(msg.sender == strategist || msg.sender == governance, "!authorized");
