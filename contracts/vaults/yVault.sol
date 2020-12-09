@@ -93,11 +93,11 @@ contract yVault is ERC20, ERC20Detailed {
     }
 
     // Used to swap any borrowed reserve over the debt limit to liquidate to 'token'
-    function harvest(address reserve, uint256 amount) external {
-        require(msg.sender == controller, "!controller");
-        require(reserve != address(token), "token");
-        IERC20(reserve).safeTransfer(controller, amount);
-    }
+    // function harvest(address reserve, uint256 amount) external {
+    //     require(msg.sender == controller, "!controller");
+    //     require(reserve != address(token), "token");
+    //     IERC20(reserve).safeTransfer(controller, amount);
+    // }
 
     // No rebalance implementation for lower fees and faster swaps
     function withdraw(uint256 _shares) public {
