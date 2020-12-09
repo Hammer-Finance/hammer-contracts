@@ -19,6 +19,8 @@ contract yVault is ERC20, ERC20Detailed {
 
     uint256 public min = 9500;
     uint256 public constant max = 10000;
+    uint256 public withdrawalFee = 200;
+    uint256 public constant withdrawalMax = 10000;
 
     address public governance;
     address public controller;
@@ -114,7 +116,11 @@ contract yVault is ERC20, ERC20Detailed {
             }
         }
 
-        token.safeTransfer(msg.sender, r);
+        // Charge the withdrawl fee
+        uint256 _fee = r.mul(withdrawalFee).div(withdrawalMax);
+        token.safeTransfer(IController(controller).rewards(), _fee);
+
+        token.safeTransfer(msg.sender, r.sub(_fee));
     }
 
     function getPricePerFullShare() public view returns (uint256) {
