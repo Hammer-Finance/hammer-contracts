@@ -26,8 +26,8 @@ contract yVault is ERC20, ERC20Detailed {
     constructor(address _token, address _controller)
         public
         ERC20Detailed(
-            string(abi.encodePacked("yearn ", ERC20Detailed(_token).name())),
-            string(abi.encodePacked("y", ERC20Detailed(_token).symbol())),
+            string(abi.encodePacked("hammer ", ERC20Detailed(_token).name())),
+            string(abi.encodePacked("h", ERC20Detailed(_token).symbol())),
             ERC20Detailed(_token).decimals()
         )
     {
