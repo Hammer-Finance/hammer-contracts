@@ -38,7 +38,7 @@ interface Controller {
     function rewards() external view returns (address);
 }
 
-contract StrategyBal {
+contract StrategyBalancerBPT {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint256;
@@ -69,7 +69,7 @@ contract StrategyBal {
     }
 
     function getName() external pure returns (string memory) {
-        return "StrategyBal";
+        return "StrategyBalancerBPT";
     }
 
     function setStrategist(address _strategist) external {
@@ -82,6 +82,7 @@ contract StrategyBal {
         performanceFee = _performanceFee;
     }
 
+    // TODO: 為什麼要註解掉？
     function deposit() public {
         // uint256 _want = IERC20(want).balanceOf(address(this));
         // if (_want > 0) {
