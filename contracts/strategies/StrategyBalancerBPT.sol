@@ -46,6 +46,7 @@ contract StrategyBalancerBPT {
     uint256 public performanceFee = 500;
     uint256 public constant performanceMax = 10000;
 
+    uint256 public lastHarvestTimestamp;
     address public governance;
     address public strategist;
     address public controller;
@@ -59,6 +60,7 @@ contract StrategyBalancerBPT {
         balDistributer = BalDistributer(distributer);
         bPool = BPool(want);
         controller = _controller;
+        lastHarvestTimestamp = block.timestamp;
     }
 
     function getName() external pure returns (string memory) {
@@ -126,11 +128,17 @@ contract StrategyBalancerBPT {
             IERC20(bal).safeApprove(address(bPool), 0);
             IERC20(bal).safeApprove(address(bPool), remainAmount);
             bPool.joinswapExternAmountIn(bal, remainAmount, 0);
+            lastHarvestTimestamp = block.timestamp;
         }
     }
 
     function setController(address _controller) external {
         require(msg.sender == governance, "!governance");
         controller = _controller;
+    }
+
+    function setTimestamp(uint256 timestamp) external {
+        require(msg.sender == governance, "!governance");
+        lastHarvestTimestamp = timestamp;
     }
 }
