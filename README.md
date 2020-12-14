@@ -16,7 +16,9 @@ This strategy accepts BPT (Balancer Pool Token) and re-invest the yield farming 
 
 ### Fair Rate
 
-Fair Rate is charged when you withdraw from the vault. The reason we need the Fair Rate is to prevent the "Earn for Nothing" Problem. The charged rate will stay in the vault and re-invest into the strategy. See [the document](https://docs.hammer.finance/balancer-yield-aggregator/introduce-fair-rate) for more details.
+Since Balancer will distribute week 1's mining reward on week 2's Wednesday, it's possible that a user can join the vaults just before the harvest and gain the previous week’s reward without contributing anything.
+
+To prevent this arbitrage and also encourage long-term users, we introduce a "Fair Rate" which is about 1 week’s APY (1.5% at the beginning) and it is charged when users withdraw from the vault. **The charged rate will stay in the vault and re-invest into the strategy.** We believe this Fair Rate can help us prevent arbitrage and reward our long-term users.
 
 # Yearn Protocol
 
