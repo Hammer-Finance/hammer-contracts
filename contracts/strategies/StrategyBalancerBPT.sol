@@ -46,7 +46,7 @@ contract StrategyBalancerBPT {
     uint256 public performanceFee = 500;
     uint256 public constant performanceMax = 10000;
 
-    uint256 public lastHarvestTimestamp;
+    uint256 public lastHarvestTimestamp = 0;
     address public governance;
     address public strategist;
     address public controller;
@@ -60,7 +60,6 @@ contract StrategyBalancerBPT {
         balDistributer = BalDistributer(distributer);
         bPool = BPool(want);
         controller = _controller;
-        lastHarvestTimestamp = block.timestamp;
     }
 
     function getName() external pure returns (string memory) {
@@ -137,7 +136,7 @@ contract StrategyBalancerBPT {
         controller = _controller;
     }
 
-    function setTimestamp(uint256 timestamp) external {
+    function setLastHarvestTimestamp(uint256 timestamp) external {
         require(msg.sender == governance, "!governance");
         lastHarvestTimestamp = timestamp;
     }
