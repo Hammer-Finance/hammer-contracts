@@ -40,9 +40,9 @@ contract StrategyBalancerBPT {
 
     // want = BPT
     // TODO: Change the address to mainnet address
-    address public constant want = address(0xc5935eA0Ad3645D37B7C545a3E603b24Ee149e0c);
-    address public constant distributer = address(0xD878865A4d9F6327cE7CE48E025ecFEA71D68A08);
-    address public constant bal = address(0x1528F3FCc26d13F7079325Fb78D9442607781c8C);
+    address public constant want = address(0x59A19D8c652FA0284f44113D0ff9aBa70bd46fB4);
+    address public constant distributer = address(0x6d19b2bF3A36A61530909Ae65445a906D98A2Fa8);
+    address public constant bal = address(0xba100000625a3754423978a60c9317c58a424e3D);
     uint256 public performanceFee = 500;
     uint256 public constant performanceMax = 10000;
 
