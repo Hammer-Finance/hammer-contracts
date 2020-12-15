@@ -38,8 +38,6 @@ contract StrategyBalancerBPT {
     using Address for address;
     using SafeMath for uint256;
 
-    // want = BPT
-    // TODO: Change the address to mainnet address
     address public constant want = address(0x59A19D8c652FA0284f44113D0ff9aBa70bd46fB4);
     address public constant distributer = address(0x6d19b2bF3A36A61530909Ae65445a906D98A2Fa8);
     address public constant bal = address(0xba100000625a3754423978a60c9317c58a424e3D);
