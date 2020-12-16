@@ -3,31 +3,11 @@ import brownie
 
 
 from brownie import (
-    StrategyCreamYFI,
-    StrategyCurveBTCVoterProxy,
-    StrategyCurveBUSDVoterProxy,
-    StrategyCurveYVoterProxy,
-    StrategyCurve3CrvVoterProxy,
-    StrategyDAICurve,
-    StrategyDForceUSDC,
-    StrategyDForceUSDT,
-    StrategyMKRVaultDAIDelegate,
-    StrategyTUSDCurve,
-    StrategyVaultUSDC,
+    StrategyBalancerBPT,
 )
 
 STRATEGIES = [
-    StrategyCreamYFI,
-    StrategyCurveBTCVoterProxy,
-    StrategyCurveBUSDVoterProxy,
-    StrategyCurveYVoterProxy,
-    StrategyCurve3CrvVoterProxy,
-    StrategyDAICurve,
-    StrategyDForceUSDC,
-    StrategyDForceUSDT,
-    StrategyMKRVaultDAIDelegate,
-    StrategyTUSDCurve,
-    StrategyVaultUSDC,
+    StrategyBalancerBPT,
 ]
 
 

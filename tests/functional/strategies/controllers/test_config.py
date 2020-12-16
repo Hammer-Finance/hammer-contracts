@@ -7,15 +7,15 @@ def test_controller_deployment(gov, rewards, Controller):
     # Double check all the deployment variable values
     assert controller.governance() == gov
     assert controller.rewards() == rewards
-    assert controller.onesplit() == "0x50FDA034C0Ce7a8f7EFDAebDA7Aa7cA21CC1267e"
-    assert controller.split() == 500
+    # assert controller.onesplit() == "0x50FDA034C0Ce7a8f7EFDAebDA7Aa7cA21CC1267e"
+    # assert controller.split() == 500
 
 
 @pytest.mark.parametrize(
     "getter,setter,val",
     [
-        ("split", "setSplit", 1000),
-        ("onesplit", "setOneSplit", None),
+        # ("split", "setSplit", 1000),
+        # ("onesplit", "setOneSplit", None),
         ("governance", "setGovernance", None),
     ],
 )

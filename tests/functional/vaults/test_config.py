@@ -3,11 +3,9 @@ import brownie
 
 from brownie import (
     yVault,
-    yWETH,
-    yDelegatedVault,
 )
 
-VAULTS = [yVault, yWETH, yDelegatedVault]
+VAULTS = [yVault]
 
 
 @pytest.mark.parametrize("Vault", VAULTS)
@@ -18,8 +16,8 @@ def test_vault_deployment(gov, token, controller, Vault):
     assert vault.controller() == controller
     assert vault.token() == token
     # UI Stuff
-    assert vault.name() == "yearn " + token.name()
-    assert vault.symbol() == "y" + token.symbol()
+    assert vault.name() == "hammer " + token.name()
+    assert vault.symbol() == "h" + token.symbol()
     assert vault.decimals() == token.decimals()
 
 
