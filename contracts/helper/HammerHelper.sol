@@ -1,87 +1,19 @@
 pragma solidity ^0.5.17;
 
-import "./openzeplin/IERC20.sol";
-import "./openzeplin/ERC20.sol";
-import "./openzeplin/SafeMath.sol";
-import "./openzeplin/Address.sol";
-import "./openzeplin/SafeERC20.sol";
-import "./openzeplin/ERC20Detailed.sol";
-import "./openzeplin/Ownable.sol";
+import "@openzeppelinV2/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelinV2/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelinV2/contracts/math/SafeMath.sol";
+import "@openzeppelinV2/contracts/utils/Address.sol";
+import "@openzeppelinV2/contracts/token/ERC20/SafeERC20.sol";
 
-interface IWETH {
-    function deposit() external payable;
+import "../../interfaces/hammer/IWeth.sol";
+import "../../interfaces/hammer/IBPool.sol";
+import "../../interfaces/yearn/IVault.sol";
 
-    function transfer(address to, uint256 value) external returns (bool);
-
-    function withdraw(uint256) external;
-}
-
-interface IBPool {
-    function joinswapExternAmountIn(
-        address tokenIn,
-        uint256 tokenAmountIn,
-        uint256 minPoolAmountOut
-    ) external payable returns (uint256 poolAmountOut);
-
-    function isBound(address t) external view returns (bool);
-
-    function getFinalTokens() external view returns (address[] memory tokens);
-
-    function totalSupply() external view returns (uint256);
-
-    function getDenormalizedWeight(address token)
-        external
-        view
-        returns (uint256);
-
-    function getTotalDenormalizedWeight() external view returns (uint256);
-
-    function getSwapFee() external view returns (uint256);
-
-    function calcPoolOutGivenSingleIn(
-        uint256 tokenBalanceIn,
-        uint256 tokenWeightIn,
-        uint256 poolSupply,
-        uint256 totalWeight,
-        uint256 tokenAmountIn,
-        uint256 swapFee
-    ) external pure returns (uint256 poolAmountOut);
-
-    function getBalance(address token) external view returns (uint256);
-}
-
-interface IVault {
-    function token() external view returns (address);
-
-    function underlying() external view returns (address);
-
-    function name() external view returns (string memory);
-
-    function symbol() external view returns (string memory);
-
-    function decimals() external view returns (uint8);
-
-    function controller() external view returns (address);
-
-    function governance() external view returns (address);
-
-    function getPricePerFullShare() external view returns (uint256);
-
-    function deposit(uint256) external;
-
-    function depositAll() external;
-
-    function withdraw(uint256) external;
-
-    function withdrawAll() external;
-}
-
-contract HammerSupport {
+contract HammerHelper {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint256;
-    event log(uint256 i);
-    event logAddress(address j);
     address public constant weth = address(0xd0A1E359811322d97991E03f863a0C30C2cF029C);
     
     function depositEthToBalancer(address balAndWethPoolAddress, uint256 minBptOut) payable public {
@@ -97,17 +29,15 @@ contract HammerSupport {
         IERC20(balAndWethPoolAddress).transfer(msg.sender, hbptAmount);
     }
     
-    function supplyEthToBalancer(address balAndWethPoolAddress, uint256 amount, uint256 minBptOut) payable public returns (uint256) {
+    function supplyEthToBalancer(address balAndWethPoolAddress, uint256 amount, uint256 minBptOut) private returns (uint256) {
         IWETH(weth).deposit.value(amount)();
-        IERC20(weth).safeApprove(
-            balAndWethPoolAddress,
-            amount
-        );
+        IERC20(weth).safeApprove(balAndWethPoolAddress, 0);
+        IERC20(weth).safeApprove(balAndWethPoolAddress, amount);
         uint256 bptAmount = IBPool(balAndWethPoolAddress).joinswapExternAmountIn(weth, amount, minBptOut);
         return bptAmount;
     }
     
-    function supplyBptToHammer(address balAndWethPoolAddress, address hammerAddress, uint256 amount) public returns (uint256){
+    function supplyBptToHammer(address balAndWethPoolAddress, address hammerAddress, uint256 amount) private returns (uint256){
         IERC20(balAndWethPoolAddress).safeApprove(hammerAddress, 0);
         IERC20(balAndWethPoolAddress).safeApprove(hammerAddress, amount);
 
