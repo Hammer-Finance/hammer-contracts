@@ -15,7 +15,7 @@ contract HammerHelper {
     using Address for address;
     using SafeMath for uint256;
 
-    address public constant WRAP_ETH_ADDRESS = address(0xd0A1E359811322d97991E03f863a0C30C2cF029C);
+    address public constant WRAP_ETH_ADDRESS = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     
     function depositEthToBalancer(address balAndWethPoolAddress, uint256 minBptOut) payable external {
         require(msg.value > 0, "ERR: No ETH sent");
@@ -33,7 +33,7 @@ contract HammerHelper {
     function supplyEthToBalancer(address balAndWethPoolAddress, uint256 amount, uint256 minBptOut) private returns (uint256) {
         IWETH(WRAP_ETH_ADDRESS).deposit.value(amount)();
         IERC20(WRAP_ETH_ADDRESS).safeApprove(balAndWethPoolAddress, 0);
-        IERC20(WRAP_ETH_ADDRESS).safeApprove(balAndWethPoolAddress,amount);
+        IERC20(WRAP_ETH_ADDRESS).safeApprove(balAndWethPoolAddress, amount);
         uint256 bptAmount = IBPool(balAndWethPoolAddress).joinswapExternAmountIn(WRAP_ETH_ADDRESS, amount, minBptOut);
         return bptAmount;
     }
