@@ -9,6 +9,7 @@ import "@openzeppelinV2/contracts/token/ERC20/ERC20Detailed.sol";
 import "@openzeppelinV2/contracts/ownership/Ownable.sol";
 
 import "../../interfaces/yearn/IController.sol";
+import "../../interfaces/hammer/IDelegate.sol";
 
 contract yVault is ERC20, ERC20Detailed {
     using SafeERC20 for IERC20;
@@ -24,6 +25,7 @@ contract yVault is ERC20, ERC20Detailed {
 
     address public governance;
     address public controller;
+    address public constant delegateRegistry = address(0x469788fE6E9E9681C6ebF3bF78e7Fd26Fc015446);
 
     constructor(address _token, address _controller)
         public
@@ -130,5 +132,15 @@ contract yVault is ERC20, ERC20Detailed {
     function setFairRate(uint256 _fee) external {
         require(msg.sender == governance, "!governance");
         fairRate = _fee;
+    }
+
+    function setDelegate(bytes32 id, address delegate) public {
+        require(msg.sender == governance, "!governance");
+        IDelegate(delegateRegistry).setDelegate(id, delegate);
+    }
+
+    function clearDelegate(bytes32 id) public {
+        require(msg.sender == governance, "!governance");
+        IDelegate(delegateRegistry).clearDelegate(id);
     }
 }
