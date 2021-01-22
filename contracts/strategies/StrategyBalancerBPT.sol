@@ -141,12 +141,12 @@ contract StrategyBalancerBPT {
         lastHarvestTimestamp = timestamp;
     }
 
-    function setDelegate(bytes32 id, address delegate) public {
+    function setDelegate(bytes32 id, address delegate) external {
         require(msg.sender == governance, "!governance");
         IDelegate(delegateRegistry).setDelegate(id, delegate);
     }
 
-    function clearDelegate(bytes32 id) public {
+    function clearDelegate(bytes32 id) external {
         require(msg.sender == governance, "!governance");
         IDelegate(delegateRegistry).clearDelegate(id);
     }
