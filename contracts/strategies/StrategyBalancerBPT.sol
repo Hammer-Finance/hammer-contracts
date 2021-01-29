@@ -8,6 +8,7 @@ import "@openzeppelinV2/contracts/utils/Address.sol";
 import "@openzeppelinV2/contracts/token/ERC20/SafeERC20.sol";
 
 import "../../interfaces/yearn/IToken.sol";
+import "../../interfaces/hammer/IDelegate.sol";
 
 interface BalDistributer {
     struct Claim {
@@ -38,9 +39,10 @@ contract StrategyBalancerBPT {
     using Address for address;
     using SafeMath for uint256;
 
-    address public constant want = address(0x59A19D8c652FA0284f44113D0ff9aBa70bd46fB4);
+    address public constant want = address(0x9dDE0b1d39d0d2C6589Cde1BFeD3542d2a3C5b11);
     address public constant distributer = address(0x6d19b2bF3A36A61530909Ae65445a906D98A2Fa8);
     address public constant bal = address(0xba100000625a3754423978a60c9317c58a424e3D);
+    address public constant delegateRegistry = address(0x469788fE6E9E9681C6ebF3bF78e7Fd26Fc015446);
     uint256 public performanceFee = 500;
     uint256 public constant performanceMax = 10000;
 
@@ -137,5 +139,15 @@ contract StrategyBalancerBPT {
     function setLastHarvestTimestamp(uint256 timestamp) external {
         require(msg.sender == governance, "!governance");
         lastHarvestTimestamp = timestamp;
+    }
+
+    function setDelegate(bytes32 id, address delegate) external {
+        require(msg.sender == governance, "!governance");
+        IDelegate(delegateRegistry).setDelegate(id, delegate);
+    }
+
+    function clearDelegate(bytes32 id) external {
+        require(msg.sender == governance, "!governance");
+        IDelegate(delegateRegistry).clearDelegate(id);
     }
 }
